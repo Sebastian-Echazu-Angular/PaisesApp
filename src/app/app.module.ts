@@ -7,6 +7,8 @@ import { HomeComponent } from './components/home/home.component';
 import { ListaPaisesComponent } from './components/lista-paises/lista-paises.component';
 import { DetallePaisComponent } from './components/detalle-pais/detalle-pais.component';
 import { NavbarComponent } from './components/shared/navbar/navbar.component';
+import { PaisesService } from './service/paises.service';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -18,9 +20,10 @@ import { NavbarComponent } from './components/shared/navbar/navbar.component';
   ],
   imports: [
     BrowserModule,
+    HttpClientModule,
     AppRoutingModule
   ],
-  providers: [],
+  providers: [PaisesService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -38,24 +38,6 @@ creamos el componente navbar pata poder navegar de una manera mas comoda dentro 
 ```bash
 ng g c components/shared/navbar --spec false
 ```
-## 6 - Crear interface
-creamos el interface con el modelo de datos. 
-```bash
-ng g i interface/pais 
-```
-## 7 - Modelo
-En la interface de datos creamos nuestro modelo de datos para que pongamos utilizarlo en nuestro proyecto.
-```typescript
-export interface Pais {
-    Nombre:string,
-    Capital: string,
-    Región : string,
-    Subregión:string,
-    Población: number,
-    Superficie:number,
-    Fronteras: Pais[] 
-}
-```
 ## 8 - Navbar
 agregamos el siguiente codigo al html de navbar
 ```html
@@ -109,110 +91,107 @@ agregamos al archivo appcomponent.html la estructura de la ruta
 ## 12 - Servicios
 creamos un servicio para poder utilizarlo en nuestro proyecto
 ```bash
-ng g s service/intrumentos --spec false
+ng g s service/paises --spec false
 ```
-## 13 - Assets
-copiamos el archivo lista_intrumentos.php en "C:\xampp\htdocs\proyectos" para que podamos acceder a los datos de este archivo y copiamos en la carpeta assets las imagenes del proyecto
-
-## 14 - Datos de la app
-agregamos al servicio el metodo para obtener del archivo de php la lista de instrumentos
+## 13 - Datos de la Api
+agregamos al servicio el metodo para obtener la lista de paises desde sudamericanos desde "https://restcountries.eu/rest/v2/regionalbloc/USAN"
 ```typescript
 import { Injectable } from '@angular/core';
-import { Instrumento } from '../interface/instrumento';
-//importamos http client para poder administrar 
 import { HttpClient } from '@angular/common/http';
-//esto nos sirve para poder mapear el archivo json
 import { map } from 'rxjs/operators';
+
 
 @Injectable({
   providedIn: 'root'
 })
-export class InstrumentosService {
+export class PaisesService {
 
-  private instrumentos: Instrumento[] = [];
+  public paises : any[] = []; 
+  paisesurl = 'https://restcountries.eu/rest/v2/regionalbloc/USAN';
 
-  // Inyecta el HttpClient cuando se instancia el servicio
-  constructor(private http: HttpClient) {}
+  constructor(private http:HttpClient) { }
 
-  public getInstrumentosFromPhp(){
-    console.log('getInstrumentosFromPhp');
-    return this.http.get('http//localhost/proyectos/lista_intrumentos.php')
-      .pipe(map((InstrumentosServe)=>{
-        this.instrumentos = JSON.parse(JSON.stringify(InstrumentosServe));
-        console.log(this.instrumentos);
-        return this.instrumentos;
-      }))
+  public getPaisesFromApi(){
+    console.log('getPaisesFromApi');
+    return this.http.get(this.paisesurl).pipe(map(paisesServe =>{
+      this.paises = JSON.parse(JSON.stringify(paisesServe));
+      console.log(this.paises);
+      return this.paises;
+    }))
   }
 }
 ```
-## 15 - Vista del componente Instrumentos
+## 15 - Vista del componente Lista-Paises
 En el html de intrumentos.html agregamos la tarjeta que por intermedio de un @ngfor utilizaremos para mostrar el conjunto de datos
 ```html
-<h1>Lista de Instrumentos</h1>
-<div class="card-columns">
-    <div class="card animated fadeIn fast" *ngFor="let instrumentoAux of instrumentos; let i = index">
-        <img class="card-img-top" src="{{instrumentoAux.imagen}}" [alt]="equipoAux">
-        <div class="card-body">
-            <h5 class="card-title">{{instrumentoAux.instrumento}}</h5>
-        </div>
+<h1>Paises Sudamericanos</h1>
+<div class="card" *ngFor="let paisAux of paises; let i = index">
+    <div class="card-header">
+        <h3>{{paisAux.name}}</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text"> Capital: {{paisAux.capital}}</p>
+        <p class="card-text"> Poblacion: {{paisAux.population}}</p>
     </div>
 </div>
 
 ```
-## 16 - Logica del componente Instrumentos
+## 16 - Logica del componente Lista-Paises
 en el archivo instrumentos.component.ts agregaremos el codigo nesesario y una inyeccion del servicio que nos proveera de los datos y metodos para ser mostrados
 ```typescript
 import { Component, OnInit } from '@angular/core';
-import { InstrumentosService } from 'src/app/service/instrumentos.service';
-import { Router } from '@angular/router';
-import { Instrumento } from 'src/app/interface/instrumento';
+import { PaisesService } from 'src/app/service/paises.service';
 
 @Component({
-  selector: 'app-instrumentos',
-  templateUrl: './instrumentos.component.html',
-  styleUrls: ['./instrumentos.component.css']
+  selector: 'app-lista-paises',
+  templateUrl: './lista-paises.component.html',
+  styleUrls: ['./lista-paises.component.css']
 })
-export class InstrumentosComponent implements OnInit {
+export class ListaPaisesComponent implements OnInit {
 
-  instrumentos : Instrumento[] = [];
-  constructor(private _intrumentosService: InstrumentosService, private routed: Router) { }
+  paises : any[] = [];
+
+  constructor(private _paisesService : PaisesService) { }
 
   ngOnInit() {
-     this._intrumentosService.getInstrumentosFromPhp().subscribe(res =>{this.instrumentos = res});
+    this._paisesService.getPaisesFromApi().subscribe(pais=>{this.paises = pais});
   }
+
 }
 ```
 ## 17 - Servicios
-agregamos a nuestro archivo app.module.ts el servicio
+agregamos a nuestro archivo app.module.ts nuestro service y el modulo HttpClient en Imports
 ```typescript
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { HomeComponent } from './component/home/home.component';
-import { InstrumentosComponent } from './component/instrumentos/instrumentos.component';
-import { NavbarComponent } from './component/shared/navbar/navbar.component';
-import { InstrumentosService } from './service/instrumentos.service';
+import { HomeComponent } from './components/home/home.component';
+import { ListaPaisesComponent } from './components/lista-paises/lista-paises.component';
+import { DetallePaisComponent } from './components/detalle-pais/detalle-pais.component';
+import { NavbarComponent } from './components/shared/navbar/navbar.component';
+import { PaisesService } from './service/paises.service';
 import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
-    InstrumentosComponent,
+    ListaPaisesComponent,
+    DetallePaisComponent,
     NavbarComponent
   ],
   imports: [
     BrowserModule,
-    //agregamos esto para manejar las solicitudes http
     HttpClientModule,
     AppRoutingModule
   ],
-  providers: [InstrumentosService],
+  providers: [PaisesService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
+
 ```
 
 ## 18 -  Home
@@ -220,8 +199,8 @@ agregamos a home una plantilla de presentacion de nuestra app
 ```html
 <div class="jumbotron jumbotron-fluid">
     <div class="container">
-        <h1 class="display-4">App de Instrumentos</h1>
-        <p class="lead">Ejemplo de una app que muestra una lista de Instrumentos</p>
+        <h1 class="display-4">App de Paises</h1>
+        <p class="lead">Ejemplo de una app que muestra una lista de Paises</p>
     </div>
 </div>
 ```
@@ -233,63 +212,36 @@ agregamos a home una plantilla de presentacion de nuestra app
 ## Home
 ![captura de home](home.png)
 ## Instrumentos
-![captura de instrumentos](instrumentos.png)
+![captura de lista-paises](paises.png)
 
 -------------------------------------------------------------------------------------------------------------------------
 
 # INCORPORACION DE DETALLE
 
-## 21 - Creamos el componente de detalles
-agregamos un componente de detalles para poder detallar cada instrumento
+## 21 - Creamos el detalle-pais
+agregamos un componente de detalles para poder detallar cada pais
 ```bash
-ng g c components/detalle --spec false
+ng g c components/detalle-pais --spec false
 ```
-## 22 - Boton Ver Detalle en Componente instrumentos
-agregamos en boton de "ver Detalle" a la tarjeta de los instrumentos para que nos conecte con el componente de detalle de cada instrumento
+## 22 - Boton Ver mas Componente lista-paises
+agregamos en boton de "ver mas" a la tarjeta de los paises para que nos conecte con el componente de detalle de cada pais
 ```html
-<button (click)="DetalleInstrumento(instrumentoAux.marca)" 
-type="button"class="btn btn-outline-primary btn-block">Ver Detalle
-</button>
+
 ```
 ## 23 - Metodo en service
 agregamos al service el metodo que nos retorna un solo isntrumento de la lista
 ```typescript
-// Busca instrumentos por marca
-  public getInstrumentoXMarca(marcaParam: string) {
-    for (const inst of this.instrumentos) {
-      if (inst.marca === marcaParam) {
-        console.log('ENCONTRE ' + inst.instrumento);
-        return inst;
-      }
-    }
-  }
+
 ```
 ## 22 - Routing de detalles
 agregamos al archivo de routing la pagina de detalles
 ```typescript
-//importamos el componente persona
-import { InstrumentoComponent } from './components/instrumento/instrumento.component';
-//componente de instrumento asociado a una marca
-{ path: 'instrumento/:marca',component:instrumentoComponent},
+
 ```
 ## 23 - Componente de instrumento
-agregamos el siguiente codigo a la pagina de instrumento .
+agregamos el siguiente codigo a la pagina de pais .
 ``` html
-<h1>Detalle del instrumento</h1>
-<hr>
-<div class="row">
-    <div class="col-md-4" style="text-align: center">
-        <img src="{{instrumento.imagen}}" class="img-fluid" [alt]="instrumento.instrumento"> <br><br>
-        <a [routerLink]="['/instrumentos']" class="btn btn-outline-danger btn-block">Regresar</a> </div>
-    <div class="col-md-8">
-        <h3 style="color: crimson">{{instrumento.marca}}</h3>
-        <h3 style="color: blue;"> {{instrumento.modelo | uppercase}}</h3>
-        <hr>
-        <p><b>Descripcion:</b>{{instrumento.descripcion}}</p>
-        <p><b>Precio:</b> {{instrumento.precio}}</p>
-        <div> <img *ngIf="instrumento.envio" src="assets/img/camion" alt="camion"> </div>
-    </div>
-</div>
+
 ```
 
 ## 24 - Componente Instrumentos

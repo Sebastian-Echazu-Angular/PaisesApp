@@ -1,1 +1,13 @@
-<p>lista-paises works!</p>
+<h1>Paises Sudamericanos</h1>
+<div class="card" *ngFor="let paisAux of paises">
+    <div class="card-header">
+        <h3>{{paisAux.name}}</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text"> Capital: {{paisAux.capital}}</p>
+        <p class="card-text"> Poblacion: {{paisAux.population}}</p>
+        <button (click)="DetallePais(paisAux.name)" type="button"
+            class="btn btn-outline-primary ">Ver Mas
+        </button>
+    </div>
+</div>

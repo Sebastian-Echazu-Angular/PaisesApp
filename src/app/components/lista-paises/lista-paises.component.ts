@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { PaisesService } from 'src/app/service/paises.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-lista-paises',
@@ -7,9 +9,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ListaPaisesComponent implements OnInit {
 
-  constructor() { }
+  paises : any[] = [];
+
+  constructor(private _paisesService : PaisesService,private router:Router) { }
 
   ngOnInit() {
+    this._paisesService.getPaisesSudamericanos().subscribe(pais=>{this.paises = pais});
   }
-
+ 
+  public DetallePais(nombrePais:string){ this.router.navigate(['/detalle-pais', nombrePais]) }
+  
 }

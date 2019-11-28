@@ -1,1 +1,19 @@
-<p>detalle-pais works!</p>
+<h1>Detalle del pais</h1>
+<hr>
+<div class="row">
+    <div class="col-md-4" style="text-align: center">
+        <img src="{{pais.flag}}" class="img-fluid" [alt]=""> <br><br>
+        <a [routerLink]="['/lista-paises']" class="btn btn-outline-danger btn-block">Regresar</a> </div>
+    <div class="col-md-8">
+        <hr>
+        <p><b>Nombre:</b>{{nombrePais}}</p>
+        <p><b>Capital:</b> {{pais.capital}}</p>
+        <p><b>Region:</b> {{pais.region}}</p>
+        <p><b>Subregion:</b> {{pais.subregion}}</p>
+        <p><b>Poblacion:</b> {{pais.population}}</p>
+        <p><b>Superficie:</b> {{pais.area}}</p>
+        <p><b>Fronteras:</b></p>
+        <ul *ngFor="let frontAux of pais.borders; let i = index"></ul>
+        <li>{{frontAux}}</li>
+    </div>
+</div>
